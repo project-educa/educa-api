@@ -1,1 +1,1 @@
-# curadoria-api
+# educa-api
