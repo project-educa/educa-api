@@ -1,6 +1,16 @@
-FROM adoptopenjdk/openjdk11:alpine
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-jar", "-Dserver.port=80", "/app.jar"]
+FROM ubuntu:latest AS build
+
+RUN apt-get update
+RUN apt-get install openjdk-17-jdk -y
+COPY . . 
+
+RUN apt-get install maven -y
+RUN mvn clean install
+
+FROM openjdk:17-jdk-slim
+
+EXPOSE 8080
+
+COPY --from=build /target/deploy_render-1.0.0.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "/app.jar"]
